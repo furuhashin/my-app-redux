@@ -1,16 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import { createStore } from 'redux';
 
 const initialState = {
+  task: '',
   tasks: []
 };
 
 function tasksReducer(state = initialState, action) {
   switch(action.type) {
+    case 'INPUT_TASK':
+      return {
+        ...state,
+        task: action.payload.task
+      };
     case 'ADD_TASK':
       return {
         ...state,
@@ -33,13 +40,8 @@ function resetReducer(state = initialState, action) {
   }
 }
 
+
 const store = createStore(tasksReducer);
-
-/*function handleChange() {
-  console.log(store.getState());
-}
-
-const unsubscribe = store.subscribe(handleChange);*/
 
 const addTask = (task) => ({
   type:'ADD_TASK',
@@ -47,27 +49,44 @@ const addTask = (task) => ({
     task
   }
 });
-
-store.dispatch(addTask('Storeを学ぶ'));
-
-console.log(store.getState());
-
-
-store.replaceReducer(resetReducer);
-
-console.log(store.getState());
+const inputTask = (task) => ({
+  type:'INPUT_TASK',
+  payload: {
+    task
+  }
+});
 
 const resetTask = () => ({
   type: 'RESET_TASK'
 });
 
-store.dispatch(resetTask());
+function TodoApp({ store }) {
+  const {task, tasks} = store.getState();
+  return (
+    <div>
+      <input type="text" onChange={(e) => store.dispatch(inputTask(e.target.value))} />
+      <input type="button" value="add" onClick={() => store.dispatch(addTask(task))} />
+      <ul>
+        {
+          tasks.map(function(item,i) {
+            return (
+              <li key={i}>{item}</li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  )
+}
 
-console.log(store.getState());
+function renderApp() {
+  render(
+    <TodoApp store={store}/>,
+    document.getElementById('root')
+  );
+}
 
-store.dispatch(addTask('Storeを学ぶ'));
+store.subscribe(() => renderApp());
+renderApp(store);
 
-console.log(store.getState());
-
-ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();
