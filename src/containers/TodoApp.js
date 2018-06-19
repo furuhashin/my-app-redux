@@ -3,6 +3,7 @@ import { push } from 'react-router-redux';
 import TodoApp from '../components/TodoApp';
 import {inputTask, addTask} from "../actions/tasks";
 
+//storeを第一引数にとる
 function mapStateToProps({tasks}) {
   return {
     task: tasks.task,
